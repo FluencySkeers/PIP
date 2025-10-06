@@ -1,0 +1,56 @@
+{
+    "name": "Intervention",
+    "type": "object",
+    "properties": {
+      "name": {
+        "type": "string",
+        "description": "Nome da intervenção"
+      },
+      "type": {
+        "type": "string",
+        "enum": [
+          "sensorial",
+          "cognitiva",
+          "social",
+          "emergencia"
+        ],
+        "description": "Tipo de intervenção"
+      },
+      "short_description": {
+        "type": "string",
+        "description": "Descrição curta da intervenção"
+      },
+      "detailed_instructions": {
+        "type": "string",
+        "description": "Instruções detalhadas de como aplicar"
+      },
+      "icon": {
+        "type": "string",
+        "description": "Nome do ícone lucide-react"
+      },
+      "color": {
+        "type": "string",
+        "description": "Cor associada (hex)"
+      },
+      "estimated_duration": {
+        "type": "number",
+        "description": "Duração estimada em minutos"
+      },
+      "materials_needed": {
+        "type": "array",
+        "description": "Materiais necessários",
+        "items": {
+          "type": "string"
+        }
+      },
+      "active": {
+        "type": "boolean",
+        "default": true
+      }
+    },
+    "required": [
+      "name",
+      "type",
+      "short_description"
+    ]
+  }

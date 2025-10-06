@@ -1,0 +1,45 @@
+{
+    "name": "Student",
+    "type": "object",
+    "properties": {
+      "name": {
+        "type": "string",
+        "description": "Nome completo do aluno"
+      },
+      "photo_url": {
+        "type": "string",
+        "description": "URL da foto do aluno"
+      },
+      "diagnoses": {
+        "type": "array",
+        "description": "Lista de diagnósticos",
+        "items": {
+          "type": "string"
+        }
+      },
+      "emergency_protocol": {
+        "type": "string",
+        "description": "Protocolo de emergência (ex: epilepsia, autolesão grave)"
+      },
+      "age": {
+        "type": "number",
+        "description": "Idade do aluno"
+      },
+      "grade": {
+        "type": "string",
+        "description": "Série/turma"
+      },
+      "special_notes": {
+        "type": "string",
+        "description": "Observações especiais sobre o aluno"
+      },
+      "active": {
+        "type": "boolean",
+        "default": true,
+        "description": "Indica se o aluno está ativo"
+      }
+    },
+    "required": [
+      "name"
+    ]
+  }

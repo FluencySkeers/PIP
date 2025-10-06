@@ -1,0 +1,48 @@
+{
+  "name": "InterventionRecord",
+  "type": "object",
+  "properties": {
+    "student_id": {
+      "type": "string",
+      "description": "ID do aluno"
+    },
+    "behavioral_state_id": {
+      "type": "string",
+      "description": "ID do estado comportamental"
+    },
+    "suggested_intervention_id": {
+      "type": "string",
+      "description": "ID da intervenção sugerida pelo sistema"
+    },
+    "applied_intervention_id": {
+      "type": "string",
+      "description": "ID da intervenção realmente aplicada"
+    },
+    "was_successful": {
+      "type": "boolean",
+      "description": "Se a intervenção funcionou"
+    },
+    "crisis_duration_minutes": {
+      "type": "number",
+      "description": "Duração da crise em minutos"
+    },
+    "notes": {
+      "type": "string",
+      "description": "Observações adicionais"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Data e hora do registro"
+    },
+    "recorded_by": {
+      "type": "string",
+      "description": "Quem registrou (email do auxiliar)"
+    }
+  },
+  "required": [
+    "student_id",
+    "behavioral_state_id",
+    "applied_intervention_id"
+  ]
+}
