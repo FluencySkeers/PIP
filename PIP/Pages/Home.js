@@ -177,3 +177,138 @@ export default function Home() {
     </div>);
 
 }
+import { Student } from "@/entities/Student"; // ALTERE ISTO
+import { Student } from "@/entities"; // PARA ISTO
+
+import React, { useState, useEffect } from "react";
+import { Student, InterventionRecord } from "@/entities"; // Importação atualizada
+import { useNavigate } from "react-router-dom";
+import { createPageUrl } from "@/utils";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Plus, Search, TrendingUp, Users, Activity } from "lucide-react";
+import { Link } from "react-router-dom";
+import StudentCard from "../components/home/StudentCard";
+import { Skeleton } from "@/components/ui/skeleton";
+
+export default function Home() {
+  const navigate = useNavigate();
+  const [students, setStudents] = useState([]);
+  const [filteredStudents, setFilteredStudents] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
+
+  // NOVO ESTADO: para guardar as estatísticas do dashboard
+  const [stats, setStats] = useState({
+    interventionsToday: 0,
+    successRate: 0,
+  });
+
+  useEffect(() => {
+    // Agora carregamos tanto os alunos como as estatísticas
+    loadDashboardData();
+  }, []);
+
+  useEffect(() => {
+    if (searchTerm) {
+      const filtered = students.filter((student) =>
+        student.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        student.grade?.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+      setFilteredStudents(filtered);
+    } else {
+      setFilteredStudents(students);
+    }
+  }, [searchTerm, students]);
+
+  // FUNÇÃO ATUALIZADA: agora carrega todos os dados necessários para a página inicial
+  const loadDashboardData = async () => {
+    setIsLoading(true);
+    try {
+      // Carrega os alunos e os registos de intervenção em paralelo
+      const [studentData, recordsData] = await Promise.all([
+        Student.filter({ active: true }, "-created_date"),
+        InterventionRecord.list()
+      ]);
+
+      setStudents(studentData);
+      setFilteredStudents(studentData);
+      
+      // *** LÓGICA PARA CALCULAR AS ESTATÍSTICAS ***
+      const today = new Date().toISOString().slice(0, 10);
+      const interventionsToday = recordsData.filter(r => r.created_date.slice(0, 10) === today).length;
+      
+      const successfulRecords = recordsData.filter(r => r.was_successful).length;
+      const successRate = recordsData.length > 0 ? ((successfulRecords / recordsData.length) * 100).toFixed(0) : 0;
+
+      setStats({ interventionsToday, successRate });
+
+    } catch (error) {
+      console.error("Erro ao carregar dados do dashboard:", error);
+    }
+    setIsLoading(false);
+  };
+
+  const handleStudentClick = (student) => {
+    navigate(createPageUrl("StudentIntervention") + `?studentId=${student.id}`);
+  };
+
+  // O resto do ficheiro (return JSX) é modificado para usar o novo estado 'stats'
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 p-6">
+      <div className="max-w-7xl mx-auto">
+        {/* Hero Section */}
+        <div className="mb-8 text-center">
+          {/* ... (sem alterações aqui) ... */}
+        </div>
+
+        {/* Stats Cards - AGORA DINÂMICOS */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg p-6 border border-purple-100">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">Alunos Ativos</p>
+                <p className="text-3xl font-bold text-purple-600 mt-1">{students.length}</p>
+              </div>
+              <div className="w-14 h-14 bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center">
+                <Users className="w-7 h-7 text-white" />
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg p-6 border border-blue-100">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">Intervenções Hoje</p>
+                {/* DADO ATUALIZADO */}
+                <p className="text-3xl font-bold text-blue-600 mt-1">{stats.interventionsToday}</p>
+              </div>
+              <div className="w-14 h-14 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-2xl flex items-center justify-center">
+                <Activity className="w-7 h-7 text-white" />
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg p-6 border border-green-100">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">Taxa de Sucesso (Geral)</p>
+                 {/* DADO ATUALIZADO */}
+                <p className="text-3xl font-bold text-green-600 mt-1">{stats.successRate}%</p>
+              </div>
+              <div className="w-14 h-14 bg-gradient-to-br from-green-500 to-emerald-500 rounded-2xl flex items-center justify-center">
+                <TrendingUp className="w-7 h-7 text-white" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Search and Actions */}
+        {/* ... (sem alterações aqui) ... */}
+
+        {/* Students Grid */}
+        {/* ... (sem alterações aqui) ... */}
+      </div>
+    </div>);
+}

@@ -372,3 +372,96 @@ export default function Students() {
     </div>
   );
 }
+
+// ... (importações existentes) ...
+
+export default function Students() {
+  const [students, setStudents] = useState([]);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [editingStudent, setEditingStudent] = useState(null);
+  const [formData, setFormData] = useState({ /* ... (estado existente) ... */ });
+  const [diagnosisInput, setDiagnosisInput] = useState("");
+  const [uploadingPhoto, setUploadingPhoto] = useState(false);
+
+  // *** NOVO ESTADO PARA CONTROLAR O ENVIO DO FORMULÁRIO ***
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // ... (funções existentes: useEffect, loadStudents, handlePhotoUpload, addDiagnosis, removeDiagnosis) ...
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    
+    // ATIVA O ESTADO DE ENVIO
+    setIsSubmitting(true);
+
+    const dataToSave = {
+      ...formData,
+      age: formData.age ? parseInt(formData.age) : undefined
+    };
+
+    try {
+      if (editingStudent) {
+        await Student.update(editingStudent.id, dataToSave);
+      } else {
+        await Student.create(dataToSave);
+      }
+
+      // Simula um pequeno atraso de rede para o feedback ser visível
+      await new Promise(resolve => setTimeout(resolve, 500));
+
+      setIsDialogOpen(false);
+      resetForm();
+      loadStudents();
+    } catch (error) {
+      console.error("Erro ao salvar aluno:", error);
+      // Aqui você poderia adicionar uma mensagem de erro para o usuário
+    } finally {
+      // DESATIVA O ESTADO DE ENVIO, MESMO QUE DÊ ERRO
+      setIsSubmitting(false);
+    }
+  };
+
+  // ... (funções handleEdit, handleDelete, resetForm - sem alterações) ...
+
+  return (
+    <div className="min-h-screen ...">
+      <div className="max-w-6xl mx-auto">
+        {/* ... (cabeçalho da página e botão de diálogo - sem alterações) ... */}
+        
+        <Dialog open={isDialogOpen} onOpenChange={/* ... */}>
+          <DialogTrigger asChild>
+            {/* ... */}
+          </DialogTrigger>
+          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+            {/* ... (cabeçalho do diálogo) ... */}
+            
+            <form onSubmit={handleSubmit} className="space-y-6">
+              {/* ... (todos os campos do formulário - sem alterações) ... */}
+
+              <div className="flex justify-end gap-3 pt-4 border-t">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setIsDialogOpen(false)}
+                  disabled={isSubmitting} // Desativa enquanto está a submeter
+                >
+                  Cancelar
+                </Button>
+                <Button
+                  type="submit"
+                  className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
+                  disabled={isSubmitting} // Desativa enquanto está a submeter
+                >
+                  {/* ALTERA O TEXTO DO BOTÃO CONFORME O ESTADO */}
+                  {isSubmitting ? "A salvar..." : (editingStudent ? "Salvar Alterações" : "Adicionar Aluno")}
+                </Button>
+              </div>
+            </form>
+          </DialogContent>
+        </Dialog>
+
+        {/* ... (lista de alunos - sem alterações) ... */}
+      </div>
+    </div>
+  );
+}
